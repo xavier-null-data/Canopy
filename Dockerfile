@@ -21,8 +21,8 @@ COPY website/frontend frontend/
 # Build frontend
 RUN cd frontend && npm run build
 
-# Move frontend build to backend public folder
-RUN mkdir -p backend/public && cp -r frontend/dist/* backend/public/
+# Move CRA build to backend public folder
+RUN mkdir -p backend/public && cp -r frontend/build/* backend/public/
 
 EXPOSE 3000
 
