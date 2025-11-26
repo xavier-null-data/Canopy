@@ -1,24 +1,35 @@
-FROM node:20-alpine
+# Base image
+FROM node:18
 
+# Working directory inside the container
 WORKDIR /app
 
 # Copy backend package files
-COPY backend/package*.json ./backend/
-# Copy frontend package files
-COPY frontend/package*.json ./frontend/
+# Since the Dockerfile is inside /website, context includes backend/
+COPY backend/package*.json backend/
 
-# Install backend deps
+# Copy frontend package files
+COPY frontend/package*.json frontend/
+
+# Install backend dependencies
 RUN cd backend && npm install
 
-# Install frontend deps
+# Install frontend dependencies
 RUN cd frontend && npm install
 
-# Copy full project
-COPY . .
+# Copy rest of backend and frontend code
+COPY backend/ backend/
+COPY frontend/ frontend/
 
-# Expose backend and frontend ports
-EXPOSE 3001
+# Build frontend
+RUN cd frontend && npm run build
+
+# Move frontend build to backend public folder (if needed)
+# Ajusta si tu backend sirve estáticos en otra ruta
+RUN mkdir -p backend/public && cp -r frontend/dist/* backend/public/
+
+# Expose backend port
 EXPOSE 3000
 
-# Start both using the shell script
-CMD ["sh", "./start.sh"]
+# Start backend
+CMD ["node", "backend/index.js"]
